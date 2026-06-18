@@ -1,0 +1,51 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+data = {
+    "email": [
+        "Click here to verify your account urgently",
+        "Your password will expire login now",
+        "Meeting scheduled at 10 AM tomorrow",
+        "Please find attached the project report",
+        "You won a prize click this link",
+        "Your bank account is blocked verify now"
+    ],
+    "label": [
+        "Phishing",
+        "Phishing",
+        "Safe",
+        "Safe",
+        "Phishing",
+        "Phishing"
+    ]
+}
+
+df = pd.DataFrame(data)
+
+x = df["email"]
+y = df["label"]
+
+vectorizer = CountVectorizer()
+x_vector = vectorizer.fit_transform(x)
+
+x_train, x_test, y_train, y_test = train_test_split(
+    x_vector, y, test_size=0.3, random_state=42
+)
+
+model = MultinomialNB()
+model.fit(x_train, y_train)
+
+y_pred = model.predict(x_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+new_email = ["Urgent! Click here to reset your password"]
+new_email_vector = vectorizer.transform(new_email)
+
+prediction = model.predict(new_email_vector)
+print("Prediction:", prediction[0])
